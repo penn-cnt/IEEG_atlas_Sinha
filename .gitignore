@@ -1,0 +1,7 @@
+.*
+.DS_store
+*.mat
+*.node
+*.edge
+Figure/
+aalROIs/
