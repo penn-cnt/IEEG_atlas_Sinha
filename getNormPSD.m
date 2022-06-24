@@ -2,7 +2,7 @@ function iEEGnormal = getNormPSD(iEEGnormal,data_timeS,SamplingFrequency)
 
 % get sampling frequency, time domain data, window length, and NFFT
 Fs = SamplingFrequency;
-data.seg = data_timeS(1:Fs*60,:);
+data.seg = data_timeS(1:min(size(data_timeS,1),Fs*60),:);
 window = Fs*2;
 NFFT = window;
 
