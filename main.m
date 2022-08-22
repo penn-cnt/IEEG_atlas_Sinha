@@ -36,13 +36,17 @@ save("../data/custom_atlas_normative.mat", "atlas")
 %% multivariate normaltive modelling of HUP-MNI
 [norm_Connection,norm_ConnectionCount,pat_Connection,pat_ConnectionCount] = ...
     mainNetwork(metaData,atlas,MNI_atlas,HUP_atlasAll,EngelSFThres,spikeThresh);
-
+%% calc multi var ab
+load('multivar_atlas_run.mat')
 try
     load('pat_ConnectionRedAAL_z.mat');
 catch
-    pat_Connection = netowkrAbr(norm_Connection,pat_Connection);
+    pat_Connection = netowkrAbr_par(norm_Connection,pat_Connection);
 end
 
+%%
+load('pat_conn_z.mat')
+%%
 abrConn = edgeslist2AbrConn(pat_Connection,HUP_atlasAll); % converts edge list to connectivity matrix
 percentile_thres = 75;
 iEEGhupAll_z = nodeAbrEdge(abrConn,iEEGhupAll_z,percentile_thres);

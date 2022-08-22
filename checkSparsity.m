@@ -11,7 +11,7 @@ end
 
 %% Remove self connections
 c  = c - diag(diag(c));
-atlas.tbl = sortrows(atlas.tbl,{'isSideLeft','Lobes'},{'ascend','descend'});
+atlas.tbl = sortrows(atlas.tbl,{'isSideLeft','Regions'},{'ascend','descend'});
 
 conn = c(atlas.tbl.Sno,:);
 conn = conn(:,atlas.tbl.Sno);
