@@ -1,30 +1,39 @@
-function patientMap = compAbnormality(patientMap,normativeMap)
+function patientMap = compAbnormality(patientMap,normativeMap, options)
 
-band = {'delta','theta','alpha','beta','gamma'};
+arguments
+    patientMap
+    normativeMap
+    options.keepNans = false
+    options.bands = {'delta','theta','alpha','beta','gamma'};
+end
+
+bands = options.bands;
 
 for i = 1:size(patientMap,1)
     roi = normativeMap.roi == patientMap.roiNum(i);
-    for b = 1:numel(band)
+    for b = 1:numel(bands)
         
         if sum(roi)>0
-            mu = normativeMap.([band{b} 'Mean'])(roi);
-            sigma = normativeMap.([band{b} 'Std'])(roi);
+            mu = normativeMap.([bands{b} 'Mean'])(roi);
+            sigma = normativeMap.([bands{b} 'Std'])(roi);
             
-            patientMap.([band{b} 'Z'])(i) = abs((patientMap.(band{b})(i) - mu)./sigma);
+            patientMap.([bands{b} 'Z'])(i) = abs((patientMap.(bands{b})(i) - mu)./sigma);
             
         else
             
-            patientMap.([band{b} 'Z'])(i) = nan;
+            patientMap.([bands{b} 'Z'])(i) = nan;
             
         end
         
     end
 end
 
-patientMap.maxAbnormality = max([patientMap.deltaZ,patientMap.thetaZ,...
-    patientMap.alphaZ,patientMap.betaZ,patientMap.gammaZ],[],2);
+allZ = cell2mat(cellfun(@(x)patientMap.([x 'Z']), bands, 'Uni', 0));
+patientMap.maxAbnormality = max(allZ,[],2);
 
-patientMap(isnan(patientMap.maxAbnormality),:) = [];
-patientMap(isinf(patientMap.maxAbnormality),:) = [];
+if ~options.keepNans
+    patientMap(isnan(patientMap.maxAbnormality),:) = [];
+    patientMap(isinf(patientMap.maxAbnormality),:) = [];
+end
 
 end
