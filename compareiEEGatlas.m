@@ -51,25 +51,25 @@ if strcmp(plt,'plot')
     print(gcf, '-dpdf', '-r300', 'Figure/bandPow.pdf');
 end
 %% Combine HUP with MNI
+
+% % Get indices ROIs common in HUP and MNI
+[inMNI, locHup] = ismember(normMNIAtlas.roi, normHUPAtlas.roi);
+iAtlas = find(inMNI)';
+
 % If a ROI is present in HUP but absent in MNI, add it to MNI
 newROIhup = normHUPAtlas(~ismember(normHUPAtlas.roi,normMNIAtlas.roi),:);
 normMNIAtlas = [normMNIAtlas;newROIhup];
 
-% For ROIs common in HUP and MNI, add data from HUP to MNI
-commonROIhup = normHUPAtlas(ismember(normHUPAtlas.roi,normMNIAtlas.roi),:);
-
 lbl = {'delta','theta','alpha','beta','gamma','broad'};
 
-for roi = 1:size(commonROIhup,1)
-    
-    id = find(normMNIAtlas.roi==commonROIhup.roi(roi));
-    
-    normMNIAtlas.nElecs(id) = normMNIAtlas.nElecs(id) + commonROIhup.nElecs(roi);
+for roi = iAtlas
+        
+    normMNIAtlas.nElecs(roi) = normMNIAtlas.nElecs(roi) + normHUPAtlas.nElecs(locHup(roi));
     
     for band = 1:numel(lbl)
-        normMNIAtlas.(lbl{band}){id} = [normMNIAtlas.(lbl{band}){id}; commonROIhup.(lbl{band}){roi}];
-        normMNIAtlas.([lbl{band} 'Mean'])(id) = mean(normMNIAtlas.(lbl{band}){id});
-        normMNIAtlas.([lbl{band} 'Std'])(id) = std(normMNIAtlas.(lbl{band}){id});
+        normMNIAtlas.(lbl{band}){roi} = [normMNIAtlas.(lbl{band}){roi}; normHUPAtlas.(lbl{band}){locHup(roi)}];
+        normMNIAtlas.([lbl{band} 'Mean'])(roi) = mean(normMNIAtlas.(lbl{band}){roi});
+        normMNIAtlas.([lbl{band} 'Std'])(roi) = std(normMNIAtlas.(lbl{band}){roi});
     end
     
 end
